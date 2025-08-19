@@ -1,5 +1,3 @@
-# Firebase Studio
+This web app is made in firebase studio and vsc, backend is in supabase and vercel as deployment.
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+LOCKr is a simple web app that can track, generate passwords for any web/app you want to keep track of. and its safe with a feature called master password, whenever someone logs in you need to know your account password. if someone succeeds to login and or refreshes the page. you have to type in your master password to access your dashboard of passwords, which is different from the account password.
