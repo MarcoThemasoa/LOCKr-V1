@@ -97,6 +97,7 @@ export function SetMasterPasswordDialog({ isOpen, setIsOpen }: { isOpen: boolean
           <DialogTitle>Set Your Master Password</DialogTitle>
           <DialogDescription>
             Create a strong master password to protect your vault. You will use this to unlock your credentials.
+            PLEASE REMEMBER THIS PASSWORD CANNOT BE CHANGED IF YOU FORGET IT!
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

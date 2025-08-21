@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { supabase } from '@/lib/supabaseClient';
+import { usePathname } from "next/navigation";
 
 export default function DashboardLayout({
   children,
@@ -36,6 +37,7 @@ export default function DashboardLayout({
 }) {
   const { user, loading, setUser, setMasterKey } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -60,17 +62,23 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <Sidebar collapsible="none">
-        <SidebarHeader className="p-4">
+      <Sidebar 
+      className="!bg-white dark:!bg-background shadow-lg border-r border-neutral-200 dark:border-neutral-800" 
+      collapsible="offcanvas">
+        <SidebarHeader className="p-4 mt-2 flex items-center justify-between">
           <Logo />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className='p-2 ml-6'>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href="/dashboard">
                   <LayoutDashboard />
-                  Dashboard
+                  <span className={`hover:underline hover:underline-offset-4 text-base
+                  ${pathname === "/dashboard" ? "text-primary font-semibold" : ""
+                    }`}>
+                    Dashboard
+                  </span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -78,7 +86,12 @@ export default function DashboardLayout({
               <SidebarMenuButton asChild>
                 <Link href="/settings">
                   <Settings />
-                  Settings
+                  <span
+                    className={`hover:underline hover:underline-offset-4 text-base
+                      ${pathname === "/settings" ? "text-primary font-semibold" : ""
+                    }`}>
+                    Settings
+                  </span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -86,7 +99,7 @@ export default function DashboardLayout({
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm md:justify-end">
+        <header className="sticky top-0 flex h-16 items-center justify-between border-b bg-white dark:bg-background shadow-sm px-4 md:justify-end">
           <SidebarTrigger className="md:hidden" />
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -115,7 +128,7 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex-1 p-8 md:p-12">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 md:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

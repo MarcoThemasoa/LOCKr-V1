@@ -169,15 +169,16 @@ export function CredentialsTable() {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="font-headline text-3xl font-bold">Dashboard</h1>
-        <div className="flex items-center gap-2">
+    <div className="space-y-4 p-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-r from-black/5 to-transparent rounded-l-md" />
+        <h1 className="p-2 font-headline text-3xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Input
-            placeholder="Search credentials..."
+            placeholder="Search Passwords..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-64"
+            className="flex-1 sm:w-64"
           />
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
@@ -205,8 +206,9 @@ export function CredentialsTable() {
           <TableHeader>
             <TableRow>
               <TableHead>Website</TableHead>
-              <TableHead className="hidden md:table-cell">Username</TableHead>
-              <TableHead className="hidden md:table-cell">Password</TableHead>
+              <TableHead>Username / Email</TableHead>
+              <TableHead>Password</TableHead>
+              <TableHead>Notes</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -214,9 +216,10 @@ export function CredentialsTable() {
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                  <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-40" /></TableCell>
-                  <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-35" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-35" /></TableCell>
                   <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                 </TableRow>
               ))
@@ -224,16 +227,26 @@ export function CredentialsTable() {
               filteredCredentials.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell>
-                    <div className="font-medium">{c.website}</div>
-                    <div className="text-sm text-muted-foreground md:hidden">{c.username}</div>
+                    <div className="font-medium">
+                      <a
+                        href={c.website.startsWith("http") ? c.website : `https://${c.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline break-words break-all">
+                        {c.website}
+                      </a>
+                    </div>
                   </TableCell>
-                  <TableCell className="hidden font-code md:table-cell">{c.username}</TableCell>
-                  <TableCell className="hidden font-code md:table-cell">
+                  <TableCell className="font-code whitespace-normal break-words break-all">{c.username}</TableCell>
+                  <TableCell className="font-code whitespace-normal break-words break-all">
                     {visiblePasswords[c.id!] ? (
                       <span>{visiblePasswords[c.id!]}</span>
                     ) : (
                       <span>••••••••</span>
                     )}
+                  </TableCell>
+                  <TableCell className="whitespace-normal break-words break-all">
+                    {c.notes || <span className="text-muted-foreground italic">No notes</span>}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="hidden items-center justify-end gap-2 md:flex">
@@ -319,7 +332,7 @@ export function CredentialsTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   You dont have passwords yet, add some?
                 </TableCell>
               </TableRow>

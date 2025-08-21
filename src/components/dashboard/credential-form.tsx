@@ -145,7 +145,7 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
 
   return (
     <ScrollArea className="max-h-[70vh] w-full">
-      <div className="pr-6">
+      <div className="p-2 pr-5">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

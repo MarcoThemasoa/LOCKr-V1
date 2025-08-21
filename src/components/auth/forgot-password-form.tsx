@@ -36,7 +36,9 @@ export function ForgotPasswordForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email);
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
       if (error) {
         toast({
           variant: 'destructive',

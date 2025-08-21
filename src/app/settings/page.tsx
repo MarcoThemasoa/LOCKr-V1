@@ -273,9 +273,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4">
       <h1 className="font-headline text-3xl font-bold">Settings</h1>
-      <Card>
+      <Card className='bg-background border-2 border-neutral-200 dark:border-primary'>
+        <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-r from-black/5 to-transparent rounded-l-md" />
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
           <CardDescription>
@@ -366,7 +367,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className='bg-background border-2 border-neutral-200 dark:border-primary'>
         <CardHeader>
           <CardTitle>Change Master Password</CardTitle>
           <CardDescription>
@@ -459,7 +460,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
       
-      <Card className="border-destructive">
+      <Card className="bg-background border-2 border-destructive">
         <CardHeader>
           <CardTitle>Delete Account</CardTitle>
           <CardDescription>
