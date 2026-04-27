@@ -79,8 +79,6 @@ export default function DashboardLayout({
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={isDashboard} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
                 <Link href="/dashboard">
-                  <LayoutDashboard className="h-5 w-5" />
-                  <span className="text-base">Vault</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
