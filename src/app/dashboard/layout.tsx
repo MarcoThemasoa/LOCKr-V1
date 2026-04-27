@@ -59,11 +59,8 @@ export default function DashboardLayout({
     );
   }
 
-  // Determine page context
+  // Determine if we are on the main dashboard to conditionally show the back button
   const isDashboard = pathname === '/dashboard';
-  const pageName = isDashboard ? 'Vault' : 
-                   pathname === '/settings' ? 'Settings' : 
-                   pathname.split('/').filter(Boolean).pop() || 'Dashboard';
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -79,6 +76,8 @@ export default function DashboardLayout({
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={isDashboard} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
                 <Link href="/dashboard">
+                  <LayoutDashboard className="h-5 w-5" />
+                  <span className="text-base">Vault</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -102,7 +101,7 @@ export default function DashboardLayout({
             <Separator orientation="vertical" className="h-6 hidden md:block bg-border/50" />
             
             <div className="flex items-center gap-1 md:gap-2">
-              {/* Dynamic Back Button */}
+              {/* Dynamic Back Button (Only visible when NOT on dashboard) */}
               {!isDashboard && (
                 <Button 
                   variant="ghost" 
@@ -113,9 +112,6 @@ export default function DashboardLayout({
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
               )}
-              <span className="text-sm font-semibold capitalize text-foreground/80 tracking-wide">
-                {pageName}
-              </span>
             </div>
           </div>
 
