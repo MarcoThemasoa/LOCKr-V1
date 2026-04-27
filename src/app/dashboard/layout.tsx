@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-provider';
-import { LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { LayoutDashboard, LogOut, Settings, ChevronLeft } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -59,8 +59,9 @@ export default function DashboardLayout({
     );
   }
 
-  // Determine the current page name for the navbar header
-  const pageName = pathname === '/dashboard' ? 'Vault' : 
+  // Determine page context
+  const isDashboard = pathname === '/dashboard';
+  const pageName = isDashboard ? 'Vault' : 
                    pathname === '/settings' ? 'Settings' : 
                    pathname.split('/').filter(Boolean).pop() || 'Dashboard';
 
@@ -76,7 +77,7 @@ export default function DashboardLayout({
         <SidebarContent className='p-2 ml-4'>
           <SidebarMenu className="gap-2">
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
+              <SidebarMenuButton asChild isActive={isDashboard} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
                 <Link href="/dashboard">
                   <LayoutDashboard className="h-5 w-5" />
                   <span className="text-base">Vault</span>
@@ -98,12 +99,22 @@ export default function DashboardLayout({
         
         {/* === ENHANCED NAVBAR HEADER === */}
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-md transition-all">
-          <div className="flex flex-1 items-center gap-3">
+          <div className="flex flex-1 items-center gap-2">
             <SidebarTrigger className="-ml-1 md:hidden" />
             <Separator orientation="vertical" className="h-6 hidden md:block bg-border/50" />
             
-            {/* Dynamic Page Context */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
+              {/* Dynamic Back Button */}
+              {!isDashboard && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => router.back()}
+                  className="h-8 w-8 rounded-full shrink-0 mr-1 text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              )}
               <span className="text-sm font-semibold capitalize text-foreground/80 tracking-wide">
                 {pageName}
               </span>
@@ -119,7 +130,6 @@ export default function DashboardLayout({
                   variant="ghost" 
                   className="relative h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/20 hover:bg-primary/20 transition-all p-0 overflow-hidden"
                 >
-                  {/* Avatar Initial */}
                   <span className="text-sm font-bold text-primary uppercase">
                     {user.email?.[0] || 'U'}
                   </span>
@@ -128,7 +138,6 @@ export default function DashboardLayout({
               </DropdownMenuTrigger>
               
               <DropdownMenuContent align="end" className="w-64 rounded-xl border-border/50 bg-card/95 backdrop-blur-md p-2 shadow-xl">
-                {/* Rich User Profile Header */}
                 <div className="flex flex-col space-y-1 p-2 pb-3 mb-1 border-b border-border/50">
                   <p className="text-sm font-medium leading-none truncate text-foreground">{user.email}</p>
                   <p className="text-xs leading-none text-muted-foreground mt-1">Personal Account</p>

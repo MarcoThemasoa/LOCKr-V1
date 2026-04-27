@@ -192,17 +192,24 @@ export function CredentialsTable() {
                 <span className="hidden md:inline">Add Item</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingCredential ? 'Edit Credential' : 'Add New Credential'}
+            
+            {/* === MOBILE OPTIMIZED MODAL CONTENT === */}
+            <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto rounded-[2rem] p-5 sm:p-8 border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl">
+              <DialogHeader className="text-left space-y-2 mb-2">
+                <DialogTitle className="text-2xl font-bold tracking-tight">
+                  {editingCredential ? 'Edit Credential' : 'New Credential'}
                 </DialogTitle>
               </DialogHeader>
-              <CredentialForm
-                credential={editingCredential}
-                onFinished={() => setIsFormOpen(false)}
-              />
+              
+              <div className="px-1 pb-1">
+                <CredentialForm
+                  credential={editingCredential}
+                  onFinished={() => setIsFormOpen(false)}
+                />
+              </div>
             </DialogContent>
+            {/* === END MOBILE OPTIMIZED MODAL CONTENT === */}
+            
           </Dialog>
         </div>
       </div>
