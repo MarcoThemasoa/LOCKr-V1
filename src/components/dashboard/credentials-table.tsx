@@ -194,19 +194,16 @@ export function CredentialsTable() {
             </DialogTrigger>
             
             {/* === MOBILE OPTIMIZED MODAL CONTENT === */}
-            <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto rounded-[2rem] p-5 sm:p-8 border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl">
-              <DialogHeader className="text-left space-y-2 mb-2">
-                <DialogTitle className="text-2xl font-bold tracking-tight">
+            <DialogContent className="w-[calc(100vw-2rem)] max-w-[400px] max-h-[85vh] overflow-y-auto rounded-3xl p-5 border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl">
+              <DialogHeader className="text-left space-y-1 mb-2">
+                <DialogTitle className="text-xl font-bold tracking-tight">
                   {editingCredential ? 'Edit Credential' : 'New Credential'}
                 </DialogTitle>
               </DialogHeader>
-              
-              <div className="px-1 pb-1">
-                <CredentialForm
-                  credential={editingCredential}
-                  onFinished={() => setIsFormOpen(false)}
-                />
-              </div>
+              <CredentialForm
+                credential={editingCredential}
+                onFinished={() => setIsFormOpen(false)}
+              />
             </DialogContent>
             {/* === END MOBILE OPTIMIZED MODAL CONTENT === */}
             
@@ -244,32 +241,36 @@ export function CredentialsTable() {
                 <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Globe className="h-5 w-5" />
                 </div>
-                <div className="flex flex-col gap-1 overflow-hidden">
+                <div className="flex flex-col gap-1 overflow-hidden w-full">
                   <a
                     href={c.website.startsWith('http') ? c.website : `https://${c.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="truncate text-base font-semibold text-foreground transition-colors hover:text-primary hover:underline"
+                    className="truncate text-base font-semibold text-foreground transition-colors hover:text-primary hover:underline w-fit"
                   >
                     {c.website}
                   </a>
                   <p className="truncate font-code text-sm text-muted-foreground">{c.username}</p>
                   
-                  {/* Notes & Revealed Password Container */}
-                  <div className="mt-1 flex flex-col gap-2">
-                    {c.notes && (
-                      <p className="line-clamp-2 text-xs italic text-muted-foreground/70">
-                        "{c.notes}"
+                  {/* Inline password reveal */}
+                  {visiblePasswords[c.id!] && (
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 px-3 py-1.5 font-code text-sm text-foreground shadow-inner w-fit max-w-full">
+                      <KeyRound className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      <span className="truncate">{visiblePasswords[c.id!]}</span>
+                    </div>
+                  )}
+
+                  {/* Brought Back: Prominent Notes/Comments Section */}
+                  {c.notes && (
+                    <div className="mt-3 rounded-lg bg-muted/30 p-3 border border-border/40">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                        Notes / Comments
                       </p>
-                    )}
-                    {/* Inline password reveal for mobile friendliness */}
-                    {visiblePasswords[c.id!] && (
-                      <div className="inline-flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 px-3 py-1.5 font-code text-sm text-foreground shadow-inner">
-                        <KeyRound className="h-3.5 w-3.5 text-primary" />
-                        <span className="break-all">{visiblePasswords[c.id!]}</span>
-                      </div>
-                    )}
-                  </div>
+                      <p className="text-sm text-foreground/80 whitespace-pre-wrap break-words">
+                        {c.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
