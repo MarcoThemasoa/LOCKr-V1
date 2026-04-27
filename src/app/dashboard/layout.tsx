@@ -2,19 +2,18 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-provider';
-import { LayoutDashboard, LogOut, Settings, UserCircle } from 'lucide-react';
+import { LayoutDashboard, LogOut, Settings } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -28,7 +27,7 @@ import {
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { supabase } from '@/lib/supabaseClient';
-import { usePathname } from "next/navigation";
+import { Separator } from '@/components/ui/separator';
 
 export default function DashboardLayout({
   children,
@@ -54,73 +53,100 @@ export default function DashboardLayout({
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-background">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-dashed border-primary"></div>
       </div>
     );
   }
 
+  // Determine the current page name for the navbar header
+  const pageName = pathname === '/dashboard' ? 'Vault' : 
+                   pathname === '/settings' ? 'Settings' : 
+                   pathname.split('/').filter(Boolean).pop() || 'Dashboard';
+
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar 
-      className="!bg-white dark:!bg-background shadow-lg border-r border-neutral-200 dark:border-neutral-800" 
-      collapsible="offcanvas">
+        className="!bg-card dark:!bg-background shadow-lg border-r border-border/50" 
+        collapsible="offcanvas"
+      >
         <SidebarHeader className="p-4 mt-2 flex items-center justify-between">
           <Logo />
         </SidebarHeader>
-        <SidebarContent className='p-2 ml-6'>
-          <SidebarMenu>
+        <SidebarContent className='p-2 ml-4'>
+          <SidebarMenu className="gap-2">
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
                 <Link href="/dashboard">
-                  <LayoutDashboard />
-                  <span className={`hover:underline hover:underline-offset-4 text-base
-                  ${pathname === "/dashboard" ? "text-primary font-semibold" : ""
-                    }`}>
-                    Dashboard
-                  </span>
+                  <LayoutDashboard className="h-5 w-5" />
+                  <span className="text-base">Vault</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild isActive={pathname === "/settings"} className="rounded-xl transition-all data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium">
                 <Link href="/settings">
-                  <Settings />
-                  <span
-                    className={`hover:underline hover:underline-offset-4 text-base
-                      ${pathname === "/settings" ? "text-primary font-semibold" : ""
-                    }`}>
-                    Settings
-                  </span>
+                  <Settings className="h-5 w-5" />
+                  <span className="text-base">Settings</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-md md:justify-end">
-          <SidebarTrigger className="md:hidden" />
-          <div className="flex items-center gap-4">
+      <SidebarInset className="bg-background">
+        
+        {/* === ENHANCED NAVBAR HEADER === */}
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-md transition-all">
+          <div className="flex flex-1 items-center gap-3">
+            <SidebarTrigger className="-ml-1 md:hidden" />
+            <Separator orientation="vertical" className="h-6 hidden md:block bg-border/50" />
+            
+            {/* Dynamic Page Context */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold capitalize text-foreground/80 tracking-wide">
+                {pageName}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
             <ThemeToggle />
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <UserCircle className="h-6 w-6" />
+                <Button 
+                  variant="ghost" 
+                  className="relative h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/20 hover:bg-primary/20 transition-all p-0 overflow-hidden"
+                >
+                  {/* Avatar Initial */}
+                  <span className="text-sm font-bold text-primary uppercase">
+                    {user.email?.[0] || 'U'}
+                  </span>
                   <span className="sr-only">Toggle user menu</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">
+              
+              <DropdownMenuContent align="end" className="w-64 rounded-xl border-border/50 bg-card/95 backdrop-blur-md p-2 shadow-xl">
+                {/* Rich User Profile Header */}
+                <div className="flex flex-col space-y-1 p-2 pb-3 mb-1 border-b border-border/50">
+                  <p className="text-sm font-medium leading-none truncate text-foreground">{user.email}</p>
+                  <p className="text-xs leading-none text-muted-foreground mt-1">Personal Account</p>
+                </div>
+                
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg mt-1 transition-colors hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary">
+                  <Link href="/settings" className="flex items-center w-full">
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <span>Account Settings</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                
+                <DropdownMenuSeparator className="bg-border/50 my-1" />
+                
+                <DropdownMenuItem 
+                  onClick={handleLogout} 
+                  className="cursor-pointer rounded-lg text-destructive focus:bg-destructive/10 focus:text-destructive transition-colors"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -128,7 +154,11 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6 md:p-8">{children}</main>
+        {/* === END NAVBAR HEADER === */}
+
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-x-hidden">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
