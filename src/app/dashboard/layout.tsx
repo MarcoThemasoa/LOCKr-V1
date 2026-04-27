@@ -99,7 +99,7 @@ export default function DashboardLayout({
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 flex h-16 items-center justify-between border-b bg-white dark:bg-background shadow-sm px-4 md:justify-end">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-background/80 px-4 shadow-sm backdrop-blur-md md:justify-end">
           <SidebarTrigger className="md:hidden" />
           <div className="flex items-center gap-4">
             <ThemeToggle />
