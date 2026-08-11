@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand/headline font: Telma (script) loaded from the Fontshare CDN.
+   Falls back to Space Grotesk, then a generic sans-serif. */
+:root {
+  --font-headline: 'Telma', 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

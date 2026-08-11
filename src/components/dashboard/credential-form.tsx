@@ -19,20 +19,53 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { Credential } from '@/lib/types';
 import { encrypt, arrayBufferToBase64 } from '@/lib/crypto';
+import {
+  sanitizeText,
+  sanitizeNotes,
+  normalizeUrl,
+  isSafeHttpUrl,
+  MAX_WEBSITE_LENGTH,
+  MAX_USERNAME_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  MAX_NOTES_LENGTH,
+} from '@/lib/security';
 import { PasswordGenerator } from '../password-generator';
 import { useState } from 'react';
 import { Eye, EyeOff, Save } from 'lucide-react';
 
+/**
+ * Client-side validation schema.
+ * Every field is trimmed, length-limited, and (for the website) restricted
+ * to safe http/https URLs. This blocks stored-XSS payloads at the source.
+ */
 const formSchema = z.object({
-  website: z.string().url({ message: 'Please enter a valid URL.' }),
-  username: z.string().min(1, 'Username is required.'),
-  password: z.string().min(1, 'Password is required.'),
-  notes: z.string().optional(),
+  website: z
+    .string()
+    .trim()
+    .min(1, 'Website is required.')
+    .max(MAX_WEBSITE_LENGTH, `Website must be at most ${MAX_WEBSITE_LENGTH} characters.`)
+    .refine(isSafeHttpUrl, {
+      message: 'Please enter a valid http(s) URL (e.g. https://example.com).',
+    }),
+  username: z
+    .string()
+    .trim()
+    .min(1, 'Username is required.')
+    .max(MAX_USERNAME_LENGTH, `Username must be at most ${MAX_USERNAME_LENGTH} characters.`),
+  password: z
+    .string()
+    .min(1, 'Password is required.')
+    .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters.`),
+  notes: z
+    .string()
+    .max(MAX_NOTES_LENGTH, `Notes must be at most ${MAX_NOTES_LENGTH} characters.`)
+    .optional(),
 });
 
 interface CredentialFormProps {
   credential?: Credential | null;
-  onFinished: () => void;
+  /** Called after a successful save (saved === true) or when the dialog is dismissed. */
+  onFinished: (saved: boolean) => void;
 }
 
 export function CredentialForm({ credential, onFinished }: CredentialFormProps) {
@@ -60,15 +93,30 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
       return;
     }
 
+    // Sanitize every field before it is persisted (defense in depth).
+    const website = normalizeUrl(values.website) ?? '';
+    const username = sanitizeText(values.username, MAX_USERNAME_LENGTH);
+    const notes = sanitizeNotes(values.notes ?? '', MAX_NOTES_LENGTH);
+
+    if (!website) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Please enter a valid website URL.',
+      });
+      return;
+    }
+
+    // Demo admin account: stores plaintext for easy inspection (no encryption).
     if (user.email === 'admin@example.com') {
       try {
         const dataToSave = {
           userId: user.id,
-          website: values.website,
-          username: values.username,
-          password: values.password,
+          website,
+          username,
+          password: sanitizeText(values.password, MAX_PASSWORD_LENGTH),
           iv: 'admin_iv',
-          notes: values.notes || '',
+          notes,
           updatedAt: new Date().toISOString(),
         };
 
@@ -81,7 +129,7 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
 
         if (error) throw error;
         toast({ title: credential ? 'Credential updated (admin)' : 'Credential added (admin)' });
-        onFinished();
+        onFinished(true);
       } catch (err) {
         toast({ variant: 'destructive', title: 'Error', description: 'Could not save admin credential.' });
       }
@@ -94,16 +142,17 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
     }
 
     try {
+      // Encrypt the password client-side before it ever reaches the server.
       const iv = crypto.getRandomValues(new Uint8Array(12));
       const { encryptedData } = await encrypt(values.password, masterKey, iv);
 
       const dataToSave = {
         userId: user.id,
-        website: values.website,
-        username: values.username,
+        website,
+        username,
         password: arrayBufferToBase64(encryptedData),
         iv: arrayBufferToBase64(iv.buffer),
-        notes: values.notes || '',
+        notes,
         updatedAt: new Date().toISOString(),
       };
 
@@ -116,7 +165,7 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
 
       if (error) throw error;
       toast({ title: credential ? 'Credential updated!' : 'Credential added!' });
-      onFinished();
+      onFinished(true);
     } catch (err) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not save credential.' });
     }
@@ -176,7 +225,7 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
               </FormItem>
             )}
           />
-          
+
           <div className="pt-1">
             <PasswordGenerator
               onPasswordGenerated={(p) =>
@@ -192,10 +241,10 @@ export function CredentialForm({ credential, onFinished }: CredentialFormProps) 
               <FormItem>
                 <FormLabel className="text-xs font-semibold uppercase text-muted-foreground">Notes (Optional Comment)</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    className="resize-none min-h-[60px]" 
-                    placeholder="Security questions, PINs, etc." 
-                    {...field} 
+                  <Textarea
+                    className="resize-none min-h-[60px]"
+                    placeholder="Security questions, PINs, etc."
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />

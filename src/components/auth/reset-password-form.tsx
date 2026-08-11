@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { LoadingScreen } from '@/components/loading-screen';
 import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z
@@ -104,11 +105,7 @@ export function ResetPasswordForm() {
   }
 
   if (checking) {
-    return (
-      <div className="flex h-40 items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-dashed border-primary" />
-      </div>
-    );
+    return <LoadingScreen fullScreen={false} label="Checking reset link…" />;
   }
 
   return (

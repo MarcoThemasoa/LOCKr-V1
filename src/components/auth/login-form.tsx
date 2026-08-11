@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +21,16 @@ import { useAuth } from '@/contexts/auth-provider';
 import { supabase } from '@/lib/supabaseClient';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { SetMasterPasswordDialog } from '../dashboard/set-master-password-dialog';
+
+// Lazy-load the master-password setup dialog (crypto + dialog primitives)
+// so it is only fetched for first-time users who actually need it.
+const SetMasterPasswordDialog = dynamic(
+  () =>
+    import('../dashboard/set-master-password-dialog').then(
+      (m) => m.SetMasterPasswordDialog
+    ),
+  { ssr: false }
+);
 
 const formSchema = z.object({
   email: z.string().email({
@@ -54,32 +64,7 @@ export function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Admin login logic
-    if (values.email === 'admin@example.com') {
-      if (values.password === 'Usagi') {
-        const masterUser: AppUser = {
-          id: 'admin-user',
-          email: 'admin@example.com',
-          displayName: 'Admin',
-        };
-        localStorage.setItem('masterUser', JSON.stringify(masterUser));
-        setUser(masterUser);
-        toast({
-          title: 'Login Successful',
-          description: "Welcome back, Admin! You're now logged in.",
-        });
-        router.push('/dashboard');
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: 'Incorrect password for the admin account.',
-        });
-      }
-      return;
-    }
-
-    // Supabase login logic
+    // All accounts (including the demo admin) authenticate through Supabase.
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
@@ -101,6 +86,16 @@ export function LoginForm() {
           email: supabaseUser.email ?? '',
         };
         setUser(appUser);
+
+        // The demo admin bypasses the master password entirely.
+        if (appUser.email === 'admin@example.com') {
+          toast({
+            title: 'Login Successful',
+            description: "Welcome back, Admin! You're now logged in.",
+          });
+          router.push('/dashboard');
+          return;
+        }
 
         // Check if user has set master password
         const { data: userRow, error: userError } = await supabase

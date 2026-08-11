@@ -15,7 +15,7 @@
 - Primary color: Dark blue (#30475E) to convey security and trust.
 - Background color: Very dark blue (#222831), a desaturated version of the primary for a dark scheme.
 - Accent color: Teal (#00ADB5), a vibrant contrast to the primary for interactive elements.
-- Font pairing: 'Space Grotesk' (sans-serif) for headlines and 'Inter' (sans-serif) for body text. 'Source Code Pro' for displaying computer code.
+- Font pairing: 'Telma' (script, via Fontshare CDN) for the LOCKr brand/headlines and 'Inter' (sans-serif) for body text. 'Source Code Pro' for displaying computer code.
 - Simple, outline-style icons for navigation and actions to maintain a clean and modern aesthetic.
 - Clean, minimal layout with ample spacing to avoid clutter and ensure ease of use.
 - Subtle transitions and animations for interactive elements, enhancing user experience without being distracting.

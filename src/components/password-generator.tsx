@@ -31,11 +31,13 @@ export function PasswordGenerator({ onPasswordGenerated }: PasswordGeneratorProp
     if (includeUppercase) charPool += upperChars;
     if (includeNumbers) charPool += numberChars;
     if (includeSymbols) charPool += symbolChars;
-    
+
+    // Cryptographically secure randomness — never Math.random(), which is
+    // predictable and would weaken generated passwords.
+    const randomBytes = crypto.getRandomValues(new Uint32Array(length));
     let password = '';
     for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charPool.length);
-      password += charPool[randomIndex];
+      password += charPool[randomBytes[i] % charPool.length];
     }
     setGeneratedPassword(password);
     onPasswordGenerated(password);

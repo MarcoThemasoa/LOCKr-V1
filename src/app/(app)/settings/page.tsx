@@ -36,9 +36,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
+import { Eye, EyeOff, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const passwordSchema = z
   .object({
@@ -64,6 +64,36 @@ const masterPasswordSchema = z
     message: "Passwords don't match",
     path: ['confirmMasterPassword'],
   });
+
+/**
+ * GradientCard — wraps a Card in a 1px animated gradient "light" border.
+ * The gradient is drawn by the wrapper's background showing through the
+ * 1px padding gap, giving a glowing border effect.
+ */
+function GradientCard({
+  children,
+  className,
+  tone = 'primary',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  tone?: 'primary' | 'destructive';
+}) {
+  return (
+    <div
+      className={cn(
+        'relative rounded-xl bg-gradient-to-r p-px shadow-lg',
+        tone === 'primary'
+          ? 'from-primary/60 via-primary/15 to-primary/60 shadow-primary/10'
+          : 'from-destructive/60 via-destructive/15 to-destructive/60 shadow-destructive/10',
+        className
+      )}
+    >
+      <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 via-transparent to-primary/20 blur-md" />
+      <Card className="relative border-0 bg-background">{children}</Card>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { user, setUser, setMasterKey } = useAuth();
@@ -92,6 +122,13 @@ export default function SettingsPage() {
     resolver: zodResolver(passwordSchema),
     defaultValues: { newPassword: '', confirmPassword: '' },
   });
+
+  async function onLogout() {
+    await supabase.auth.signOut();
+    setUser(null);
+    setMasterKey(null);
+    router.push('/');
+  }
 
   async function onChangePassword(values: z.infer<typeof passwordSchema>) {
     if (!user || !user.email) return;
@@ -274,9 +311,19 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8 p-4">
-      <h1 className="font-headline text-3xl font-bold">Settings</h1>
-      <Card className='bg-background border-2 border-neutral-200 dark:border-primary'>
-        <div className="absolute inset-y-0 left-0 w-2 bg-gradient-to-r from-black/5 to-transparent rounded-l-md" />
+      <div className="flex items-center justify-between">
+        <h1 className="font-headline text-3xl font-bold">Settings</h1>
+        <Button
+          variant="outline"
+          onClick={onLogout}
+          className="gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
+          <LogOut className="h-4 w-4" />
+          Log Out
+        </Button>
+      </div>
+
+      <GradientCard>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
           <CardDescription>
@@ -365,9 +412,9 @@ export default function SettingsPage() {
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </GradientCard>
 
-      <Card className='bg-background border-2 border-neutral-200 dark:border-primary'>
+      <GradientCard>
         <CardHeader>
           <CardTitle>Change Master Password</CardTitle>
           <CardDescription>
@@ -458,9 +505,9 @@ export default function SettingsPage() {
             </form>
           </Form>
         </CardContent>
-      </Card>
-      
-      <Card className="bg-background border-2 border-destructive">
+      </GradientCard>
+
+      <GradientCard tone="destructive">
         <CardHeader>
           <CardTitle>Delete Account</CardTitle>
           <CardDescription>
@@ -488,7 +535,7 @@ export default function SettingsPage() {
             </AlertDialogContent>
           </AlertDialog>
         </CardContent>
-      </Card>
+      </GradientCard>
     </div>
   );
 }

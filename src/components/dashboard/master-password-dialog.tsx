@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { showGameToast } from '@/components/game-toast';
 import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
@@ -81,6 +82,7 @@ export function MasterPasswordDialog() {
       if (decrypted === 'LOCKrVerification') {
         setMasterKey(key);
         setIsOpen(false);
+        showGameToast('Unlocked!');
         toast({ title: 'Vault Unlocked' });
       } else {
         throw new Error('Incorrect master password.');

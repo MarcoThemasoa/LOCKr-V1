@@ -1,25 +1,27 @@
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk, Source_Code_Pro } from 'next/font/google';
+import { Inter, Source_Code_Pro } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-provider';
+import { GameToast } from '@/components/game-toast';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/contexts/theme-provider';
 
+// Body font: Inter (Google Fonts, self-hosted via next/font).
 const fontBody = Inter({
   subsets: ['latin'],
   variable: '--font-body',
 });
 
-const fontHeadline = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-headline',
-});
-
+// Code font: Source Code Pro (Google Fonts, self-hosted via next/font).
 const fontCode = Source_Code_Pro({
   subsets: ['latin'],
   variable: '--font-code',
 });
+
+// Headline/brand font: Telma (script font from Indian Type Foundry).
+// Loaded at runtime from the Fontshare CDN (see <head> below) and exposed
+// through the --font-headline CSS variable defined in globals.css.
 
 
 export const metadata: Metadata = {
@@ -35,13 +37,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+        {/* Inter & Source Code Pro are self-hosted via next/font (see above).
+            Only the Telma brand font is loaded at runtime from Fontshare. */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
+        <link href="https://api.fontshare.com/v2/css?f[]=telma@400,500,600,700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn("font-body antialiased", fontBody.variable, fontHeadline.variable, fontCode.variable)}>
+      <body className={cn("font-body antialiased", fontBody.variable, fontCode.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -51,6 +53,8 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster />
+            {/* Always-mounted game-style notifications (e.g. "Unlocked!") */}
+            <GameToast />
           </AuthProvider>
         </ThemeProvider>
       </body>
