@@ -13,7 +13,7 @@ import { UserMenu } from '@/components/user-menu';
 import { useIdleLock } from '@/hooks/use-idle-lock';
 import { supabase } from '@/lib/supabaseClient';
 import { LoadingScreen } from '@/components/loading-screen';
-import { PageTransition } from '@/components/page-transition';
+import { SimplePageTransition } from '@/components/page-transition';
 import { cn } from '@/lib/utils';
 
 // Lazy-load the lock screen so react-hook-form, zod and the crypto helpers
@@ -145,7 +145,7 @@ export default function DashboardLayout({
 
       {/* pb-20 keeps content clear of the mobile bottom nav */}
       <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-x-hidden pb-20 md:pb-8">
-        <PageTransition>{children}</PageTransition>
+        <SimplePageTransition>{children}</SimplePageTransition>
       </main>
 
       {/* Mobile-only bottom navigation */}

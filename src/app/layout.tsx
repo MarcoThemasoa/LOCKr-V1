@@ -42,6 +42,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
         <link href="https://api.fontshare.com/v2/css?f[]=telma@400,500,600,700&display=swap" rel="stylesheet" />
+
+        {/* Preload both logo variants to prevent flash/lag on theme switch */}
+        <link rel="preload" href="/logo-light.png" as="image" type="image/png" />
+        <link rel="preload" href="/logo-dark.png" as="image" type="image/png" />
+        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
       </head>
       <body className={cn("font-body antialiased", fontBody.variable, fontCode.variable)}>
         <ThemeProvider
